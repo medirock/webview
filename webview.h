@@ -104,6 +104,8 @@ struct webview {
   webview_external_invoke_cb_t external_invoke_cb;
   struct webview_priv priv;
   void *userdata;
+
+  const char *gtk_custom_css;
 };
 
 enum webview_dialog_type {
@@ -299,6 +301,19 @@ WEBVIEW_API int webview_init(struct webview *w) {
   w->priv.queue = g_async_queue_new();
   w->priv.window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
   gtk_window_set_title(GTK_WINDOW(w->priv.window), w->title);
+
+  if(strlen(w->gtk_custom_css) > 0) {
+    GdkScreen *screen = gdk_screen_get_default();
+    GtkCssProvider *provider = gtk_css_provider_new();
+    gtk_css_provider_load_from_data(provider, w->gtk_custom_css, -1, NULL);
+    gtk_style_context_add_provider_for_screen(screen, provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
+  }
+
+  GtkHeaderBar *header = gtk_header_bar_new();
+  gtk_header_bar_set_title(header, w->title);
+  gtk_header_bar_set_has_subtitle(header, false);
+  gtk_header_bar_set_show_close_button(header, true);
+  gtk_window_set_titlebar(GTK_WINDOW(w->priv.window), header);
 
   if (w->resizable) {
     gtk_window_set_default_size(GTK_WINDOW(w->priv.window), w->width,
