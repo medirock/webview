@@ -1264,6 +1264,7 @@ WEBVIEW_API int webview_init(struct webview *w) {
   DWORD style;
   RECT clientRect;
   RECT rect;
+  HICON hIcon;
 
   if (webview_fix_ie_compat_mode() < 0) {
     return -1;
@@ -1276,11 +1277,13 @@ WEBVIEW_API int webview_init(struct webview *w) {
   if (OleInitialize(NULL) != S_OK) {
     return -1;
   }
+  hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(2));
   ZeroMemory(&wc, sizeof(WNDCLASSEX));
   wc.cbSize = sizeof(WNDCLASSEX);
   wc.hInstance = hInstance;
   wc.lpfnWndProc = wndproc;
   wc.lpszClassName = classname;
+  wc.hIcon = hIcon;
   RegisterClassEx(&wc);
 
   style = WS_OVERLAPPEDWINDOW;
